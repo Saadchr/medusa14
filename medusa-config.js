@@ -62,20 +62,20 @@ const plugins = [
       settings: {
         products: {
           indexSettings: {
-            searchableAttributes: ["title", "description", "variant_sku"],
+            searchableAttributes: ["title", "description", "price"],
             displayedAttributes: [
               "title",
               "description",
-              "variant_sku",
+              "price",
               "thumbnail",
-              "handle",
+              "id",
             ],
           },
           primaryKey: "id",
-          transformer: (product) => ({
-            id: product.id,
-            // other attributes...
-          }),
+          // transformer: (product) => ({
+          //   id: product.id,
+          //   // other attributes...
+          // }),
         },
       },
     },
