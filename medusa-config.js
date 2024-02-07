@@ -69,6 +69,7 @@ const plugins = [
               "price",
               "thumbnail",
               "id",
+              "handle",
             ],
           },
           primaryKey: "id",
