@@ -53,7 +53,7 @@ const plugins = [
   //   },
   // },
   {
-    resolve: `medusa-plugin-meilisearch`,
+    resolve: "medusa-plugin-meilisearch",
     options: {
       config: {
         host: process.env.MEILISEARCH_HOST,
@@ -62,7 +62,12 @@ const plugins = [
       settings: {
         products: {
           indexSettings: {
-            searchableAttributes: ["title", "description", "price"],
+            searchableAttributes: [
+              "title",
+              "description",
+              "price",
+              "collection_title",
+            ],
             displayedAttributes: [
               "title",
               "description",
@@ -70,13 +75,21 @@ const plugins = [
               "thumbnail",
               "id",
               "handle",
+              "collection_title",
             ],
           },
           primaryKey: "id",
-          // transformer: (product) => ({
-          //   id: product.id,
-          //   // other attributes...
-          // }),
+          transformer: (product) => ({
+            id: product.id,
+            title: product.title,
+            description: product.description,
+            price: product.price,
+            thumbnail: product.thumbnail,
+            handle: product.handle,
+            collection_title: product.collection
+              ? product.collection.title
+              : null,
+          }),
         },
       },
     },
