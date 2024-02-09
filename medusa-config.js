@@ -79,9 +79,9 @@ const plugins = [
           // The success redirect can be overriden from the client by adding a query param `?redirectTo=your_url` to the auth url
           // This query param will have the priority over this configuration
           successRedirect: `${STORE_URL}/`,
-          authPath: "/store/auth/google",
-          authCallbackPath: "/store/auth/google/cb",
-          expiresIn: 24 * 60 * 60 * 1000,
+          // authPath: "/store/auth/google",
+          // authCallbackPath: "/store/auth/google/cb",
+          // expiresIn: 24 * 60 * 60 * 1000,
           // verifyCallback: (container, req, accessToken, refreshToken, profile, strict) => {
           //    // implement your custom verify callback here if you need it
           // },
