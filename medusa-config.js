@@ -66,8 +66,8 @@ const plugins = [
           // This query param will have the priority over this configuration
           successRedirect: `${STORE_URL}/account`,
           authPath: "/store/auth/google",
-          // authCallbackPath: "/store/auth/google/cb",
-          // expiresIn: 24 * 60 * 60 * 1000,s
+          authCallbackPath: "/store/auth/google/cb",
+          expiresIn: 24 * 60 * 60 * 1000,
           // verifyCallback: (container, req, accessToken, refreshToken, profile, strict) => {
           //    // implement your custom verify callback here if you need it
           // },
