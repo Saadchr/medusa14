@@ -85,6 +85,7 @@ const plugins = [
           // verifyCallback: (container, req, accessToken, refreshToken, profile, strict) => {
           //    // implement your custom verify callback here if you need it
           // },
+          scope: [`email`, `profile`],
         },
       },
     ],
