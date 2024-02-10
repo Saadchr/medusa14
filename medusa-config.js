@@ -61,13 +61,13 @@ const plugins = [
         clientID: GoogleClientId,
         clientSecret: GoogleClientSecret,
         store: {
-          callbackUrl: `${BACKEND_URL}/store/auth/google/cb`,
-          failureRedirect: `${STORE_URL}/login`,
+          callbackUrl: "http://localhost:9000/store/auth/google/cb",
+          failureRedirect: "http://localhost:8000/login",
           // The success redirect can be overriden from the client by adding a query param `?redirectTo=your_url` to the auth url
           // This query param will have the priority over this configuration
-          successRedirect: `${STORE_URL}/account`,
+          successRedirect: `http://localhost:8000/account`,
           authPath: "/store/auth/google",
-          // authCallbackPath: "/store/auth/google/cb",
+          authCallbackPath: "/store/auth/google/cb",
           expiresIn: 24 * 60 * 60 * 1000,
           // verifyCallback: (container, req, accessToken, refreshToken, profile, strict) => {
           //    // implement your custom verify callback here if you need it
