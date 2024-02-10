@@ -34,7 +34,8 @@ const DATABASE_URL =
 const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 
 const BACKEND_URL = process.env.BACKEND_URL || "localhost:9000";
-const STORE_URL = "medusa14-storefront-git-googleauthui-saadchr.vercel.app";
+const STORE_URL =
+  "https://medusa14-storefront-git-googleauthui-saadchr.vercel.app";
 
 const GoogleClientId = process.env.GOOGLE_CLIENT_ID || "";
 const GoogleClientSecret = process.env.GOOGLE_CLIENT_SECRET || "";
