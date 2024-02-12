@@ -34,7 +34,7 @@ const DATABASE_URL =
 const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 
 const BACKEND_URL = process.env.BACKEND_URL || "localhost:9000";
-const STORE_URL = "https://www.samistore.ma";
+const STORE_URL = "http://localhost:8000";
 
 const GoogleClientId = process.env.GOOGLE_CLIENT_ID || "";
 const GoogleClientSecret = process.env.GOOGLE_CLIENT_SECRET || "";
