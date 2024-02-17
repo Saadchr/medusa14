@@ -149,7 +149,8 @@ const plugins = [
     options: {
       account_id: "eef1feb6c3e441a7501f892b6cc5fa51",
       access_key: "60e395327f8212cd428d511c15cf47c7",
-      secret_key: process.env.CLOUDFLARE_SECRET_KEY,
+      secret_key:
+        "618a6a1f44d14cd2b4091cdea5b32269d7ae58a630030a1b460790949d1f4d1a",
       bucket: "samistore",
       public_url: "https://www.juststoring.com",
     },
