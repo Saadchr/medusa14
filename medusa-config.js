@@ -144,6 +144,16 @@ const plugins = [
       order_placed_template: process.env.SENDGRID_ORDER_PLACED_ID,
     },
   },
+  {
+    resolve: "medusa-file-r2",
+    options: {
+      account_id: "eef1feb6c3e441a7501f892b6cc5fa51",
+      access_key: "60e395327f8212cd428d511c15cf47c7",
+      secret_key: process.env.CLOUDFLARE_SECRET_KEY,
+      bucket: "samistore",
+      public_url: "https://www.juststoring.com",
+    },
+  },
 ];
 
 const modules = {
