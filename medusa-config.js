@@ -86,13 +86,74 @@ const plugins = [
   //     },
   //   },
   // },
+  // {
+  //   resolve: "medusa-plugin-meilisearch",
+  //   options: {
+  //     config: {
+  //       host: process.env.MEILISEARCH_HOST,
+  //       apiKey: process.env.MEILISEARCH_API_KEY,
+  //     },
+  //     settings: {
+  //       products: {
+  //         indexSettings: {
+  //           searchableAttributes: [
+  //             "title",
+  //             "description",
+  //             "price",
+  //             "collection_title",
+  //             "categories",
+  //           ],
+  //           displayedAttributes: [
+  //             "title",
+  //             "description",
+  //             "price",
+  //             "thumbnail",
+  //             "id",
+  //             "handle",
+  //             "collection_title",
+  //             "categories",
+  //             "battery",
+  //           ],
+  //         },
+  //         primaryKey: "id",
+  //         transformer: (product) => ({
+  //           id: product.id,
+  //           title: product.title,
+  //           description: product.description || "", // Handle null or undefined values
+  //           price: product.price,
+  //           thumbnail: product.thumbnail,
+  //           handle: product.handle,
+  //           collection_title: product.collection
+  //             ? product.collection.title
+  //             : null,
+  //           categories: product.categories
+  //             ? {
+  //                 lvl0: "products",
+  //                 ...product.categories.reduce((acc, cat, index) => {
+  //                   // Constructing each level based on the category hierarchy
+  //                   const level = `lvl${index + 1}`;
+  //                   acc[level] =
+  //                     index === 0
+  //                       ? `products > ${cat.name}`
+  //                       : `${acc[`lvl${index}`]} > ${cat.name}`;
+  //                   return acc;
+  //                 }, {}),
+  //               }
+  //             : null,
+  //           battery: product.metadata?.Batterie
+  //             ? product.metadata.Batterie
+  //             : null,
+  //         }),
+  //       },
+  //     },
+  //   },
+  // },
+
   {
-    resolve: "medusa-plugin-meilisearch",
+    resolve: "medusa-plugin-algolia",
     options: {
-      config: {
-        host: process.env.MEILISEARCH_HOST,
-        apiKey: process.env.MEILISEARCH_API_KEY,
-      },
+      applicationId: process.env.ALGOLIA_APP_ID,
+      adminApiKey: process.env.ALGOLIA_ADMIN_API_KEY,
       settings: {
         products: {
           indexSettings: {
@@ -101,8 +162,14 @@ const plugins = [
               "description",
               "price",
               "collection_title",
+              "categories.lvl0",
+              "categories.lvl1",
+              "categories.lvl2",
+              "categories.lvl3",
+              "categories.lvl4",
+              "categories.lvl5",
             ],
-            displayedAttributes: [
+            attributesToRetrieve: [
               "title",
               "description",
               "price",
@@ -110,24 +177,51 @@ const plugins = [
               "id",
               "handle",
               "collection_title",
+              "categories.lvl0",
+              "categories.lvl1",
+              "categories.lvl2",
+              "categories.lvl3",
+              "categories.lvl4",
+              "categories.lvl5",
+              "battery",
             ],
           },
-          primaryKey: "id",
-          transformer: (product) => ({
-            id: product.id,
-            title: product.title,
-            description: product.description,
-            price: product.price,
-            thumbnail: product.thumbnail,
-            handle: product.handle,
-            collection_title: product.collection
-              ? product.collection.title
-              : null,
-          }),
+          transformer: (product) => {
+            // Initialize the categories object with the first level.
+
+            // Return the transformed product object for Algolia.
+            return {
+              objectID: product.id,
+              id: product.id,
+              title: product.title,
+              description: product.description || "", // Handle null or undefined values
+              price: product.price,
+              thumbnail: product.thumbnail,
+              handle: product.handle,
+              categories: product.categories,
+              collection_title: product.collection
+                ? product.collection.title
+                : null,
+              "categories.lvl0": "products",
+              // Since you're looking for a specific hierarchy, you might need to adjust how you derive these levels from your product data.
+              // Assuming the first category in your list is the direct category, and any subsequent categories represent deeper levels.
+              ...product.categories.reduce((acc, cat, index) => {
+                const levelKey = `categories.lvl${index + 1}`; // e.g., categories.lvl1
+                acc[levelKey] = `${
+                  acc[`categories.lvl${index}`] || "products"
+                } > ${cat.name}`;
+                return acc;
+              }, {}), // Assign the constructed categories object
+              battery: product.metadata?.Batterie
+                ? product.metadata.Batterie
+                : null,
+            };
+          },
         },
       },
     },
   },
+
   {
     resolve: "@medusajs/admin",
     /** @type {import('@medusajs/admin').PluginOptions} */
