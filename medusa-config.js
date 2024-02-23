@@ -101,6 +101,7 @@ const plugins = [
               "description",
               "price",
               "collection_title",
+              "categories",
             ],
             displayedAttributes: [
               "title",
@@ -110,18 +111,38 @@ const plugins = [
               "id",
               "handle",
               "collection_title",
+              "categories",
+              "battery",
             ],
+            filterableAttributes: ["categories"],
           },
           primaryKey: "id",
           transformer: (product) => ({
             id: product.id,
             title: product.title,
-            description: product.description,
+            description: product.description || "", // Handle null or undefined values
             price: product.price,
             thumbnail: product.thumbnail,
             handle: product.handle,
             collection_title: product.collection
               ? product.collection.title
+              : null,
+            categories: product.categories
+              ? {
+                  lvl0: "products",
+                  ...product.categories.reduce((acc, cat, index) => {
+                    // Constructing each level based on the category hierarchy
+                    const level = `lvl${index + 1}`;
+                    acc[level] =
+                      index === 0
+                        ? `products > ${cat.name}`
+                        : `${acc[`lvl${index}`]} > ${cat.name}`;
+                    return acc;
+                  }, {}),
+                }
+              : null,
+            battery: product.metadata?.Batterie
+              ? product.metadata.Batterie
               : null,
           }),
         },
