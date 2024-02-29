@@ -113,38 +113,85 @@ const plugins = [
               "collection_title",
               "categories",
               "battery",
+              "cheapest_variant_price_per_country",
             ],
-            filterableAttributes: ["categories"],
+            filterableAttributes: [
+              "categories",
+              "battery",
+              "cheapest_variant_price_per_country",
+            ],
+            sortableAttributes: [
+              "created_at",
+              "cheapest_variant_price_per_country",
+              "battery",
+            ],
           },
+          keepZeroFacets: true,
           primaryKey: "id",
-          transformer: (product) => ({
-            id: product.id,
-            title: product.title,
-            description: product.description || "", // Handle null or undefined values
-            price: product.price,
-            thumbnail: product.thumbnail,
-            handle: product.handle,
-            collection_title: product.collection
-              ? product.collection.title
-              : null,
-            categories: product.categories
-              ? {
-                  lvl0: "products",
-                  ...product.categories.reduce((acc, cat, index) => {
-                    // Constructing each level based on the category hierarchy
-                    const level = `lvl${index + 1}`;
-                    acc[level] =
-                      index === 0
-                        ? `products > ${cat.name}`
-                        : `${acc[`lvl${index}`]} > ${cat.name}`;
-                    return acc;
-                  }, {}),
+          transformer: (product) => {
+            const regionToCountryMapping = JSON.parse(
+              process.env.REGION_TO_COUNTRY_MAPPING
+            );
+            const cheapestPricePerCountry = product.variants.reduce(
+              (acc, variant) => {
+                {
+                  variant.prices.forEach((price) => {
+                    {
+                      const countryCode =
+                        regionToCountryMapping[price.region_id];
+                      if (
+                        countryCode &&
+                        (!acc[countryCode] || price.amount < acc[countryCode])
+                      ) {
+                        {
+                          acc[countryCode] = price.amount;
+                        }
+                      }
+                    }
+                  });
+                  return acc;
                 }
-              : null,
-            battery: product.metadata?.Batterie
-              ? product.metadata.Batterie
-              : null,
-          }),
+              },
+              {}
+            );
+            const cheapestPricePerCountryInUnits = {};
+            for (const [countryCode, price] of Object.entries(
+              cheapestPricePerCountry
+            )) {
+              cheapestPricePerCountryInUnits[countryCode] = price / 100;
+            }
+
+            return {
+              id: product.id,
+              title: product.title,
+              description: product.description || "", // Handle null or undefined values
+              price: product.price,
+              thumbnail: product.thumbnail,
+              handle: product.handle,
+              collection_title: product.collection
+                ? product.collection.title
+                : null,
+              categories: product.categories
+                ? {
+                    lvl0: "products",
+                    ...product.categories.reduce((acc, cat, index) => {
+                      // Constructing each level based on the category hierarchy
+                      const level = `lvl${index + 1}`;
+                      acc[level] =
+                        index === 0
+                          ? `products > ${cat.name}`
+                          : `${acc[`lvl${index}`]} > ${cat.name}`;
+                      return acc;
+                    }, {}),
+                  }
+                : null,
+              battery: product.metadata?.Batterie
+                ? parseInt(product.metadata.Batterie)
+                : 0,
+              cheapest_variant_price_per_country:
+                cheapestPricePerCountryInUnits?.ma,
+            };
+          },
         },
       },
     },
