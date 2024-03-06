@@ -127,15 +127,12 @@ const plugins = [
               "categories",
               "battery",
               "cheapest_variant_price_per_country",
-              "etat",
-              "resistance-eau",
               "discount_price",
             ],
             filterableAttributes: [
               "categories",
               "battery",
               "cheapest_variant_price_per_country",
-              "etat",
               "discount_price",
             ],
             sortableAttributes: [
@@ -143,7 +140,6 @@ const plugins = [
               "created_at",
               "cheapest_variant_price_per_country",
               "battery",
-              "etat",
               "discount_price",
             ],
           },
