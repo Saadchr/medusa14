@@ -1,4 +1,5 @@
 const dotenv = require("dotenv");
+// import { registerOverriddenValidators } from "@medusajs/medusa";
 
 let ENV_FILE_NAME = "";
 switch (process.env.NODE_ENV) {
@@ -46,6 +47,16 @@ const plugins = [
     resolve: `@medusajs/file-local`,
     options: {
       upload_dir: "uploads",
+    },
+  },
+  {
+    resolve: `medusa-custom-attributes`,
+    options: {
+      enableUI: true,
+      projectConfig: {
+        store_cors: process.env.STORE_CORS,
+        admin_cors: process.env.ADMIN_CORS,
+      },
     },
   },
   {
@@ -102,6 +113,8 @@ const plugins = [
               "price",
               "collection_title",
               "categories",
+              "etat",
+              "resistance-eau",
             ],
             displayedAttributes: [
               "title",
@@ -114,16 +127,24 @@ const plugins = [
               "categories",
               "battery",
               "cheapest_variant_price_per_country",
+              "etat",
+              "resistance-eau",
+              "discount_price",
             ],
             filterableAttributes: [
               "categories",
               "battery",
               "cheapest_variant_price_per_country",
+              "etat",
+              "discount_price",
             ],
             sortableAttributes: [
+              "categories",
               "created_at",
               "cheapest_variant_price_per_country",
               "battery",
+              "etat",
+              "discount_price",
             ],
           },
           keepZeroFacets: true,
@@ -132,34 +153,52 @@ const plugins = [
             const regionToCountryMapping = JSON.parse(
               process.env.REGION_TO_COUNTRY_MAPPING
             );
-            const cheapestPricePerCountry = product.variants.reduce(
-              (acc, variant) => {
-                {
-                  variant.prices.forEach((price) => {
-                    {
-                      const countryCode =
-                        regionToCountryMapping[price.region_id];
-                      if (
-                        countryCode &&
-                        (!acc[countryCode] || price.amount < acc[countryCode])
-                      ) {
-                        {
-                          acc[countryCode] = price.amount;
-                        }
-                      }
+            const cheapestPricePerCountry = Array.isArray(product.variants)
+              ? product?.variants.reduce((acc, variant) => {
+                  variant?.prices?.forEach((price) => {
+                    const countryCode =
+                      regionToCountryMapping[price?.region_id];
+                    if (
+                      countryCode &&
+                      (!acc[countryCode] || price?.amount < acc[countryCode])
+                    ) {
+                      acc[countryCode] = price?.amount;
                     }
                   });
                   return acc;
-                }
-              },
-              {}
-            );
+                }, {})
+              : {};
             const cheapestPricePerCountryInUnits = {};
             for (const [countryCode, price] of Object.entries(
               cheapestPricePerCountry
             )) {
               cheapestPricePerCountryInUnits[countryCode] = price / 100;
             }
+
+            const categories =
+              product.categories && Array.isArray(product.categories)
+                ? product.categories.reduce(
+                    (acc, cat, index) => {
+                      // lvl0 is always "products", so we start at lvl1
+                      const level = `lvl${index + 1}`;
+                      acc[level] =
+                        index === 0
+                          ? `products > ${cat.name}`
+                          : `${acc[`lvl${index}`]} > ${cat.name}`;
+                      return acc;
+                    },
+                    { lvl0: "products" }
+                  ) // Initialize with lvl0
+                : { lvl0: "products" };
+
+            let discountPrice;
+            product.variants.forEach((variant) => {
+              variant.prices.forEach((price) => {
+                if (price.price_list_id) {
+                  discountPrice = parseInt(price.amount) / 100;
+                }
+              });
+            });
 
             return {
               id: product.id,
@@ -168,44 +207,24 @@ const plugins = [
               price: product.price,
               thumbnail: product.thumbnail,
               handle: product.handle,
-              collection_title: product.collection
-                ? product.collection.title
-                : null,
-              categories: product.categories
-                ? {
-                    lvl0: "products",
-                    ...product.categories.reduce((acc, cat, index) => {
-                      // Constructing each level based on the category hierarchy
-                      const level = `lvl${index + 1}`;
-                      acc[level] =
-                        index === 0
-                          ? `products > ${cat.name}`
-                          : `${acc[`lvl${index}`]} > ${cat.name}`;
-                      return acc;
-                    }, {}),
-                  }
-                : null,
               battery: product.metadata?.Batterie
                 ? parseInt(product.metadata.Batterie)
                 : 0,
+              collection_title: product.collection
+                ? product.collection.title
+                : null,
+              categories: categories,
               cheapest_variant_price_per_country:
                 cheapestPricePerCountryInUnits?.ma,
+              discount_price: discountPrice,
+              // custom_attributes: product.custom_attributes,
             };
           },
         },
       },
     },
   },
-  {
-    resolve: `medusa-custom-attributes`,
-    options: {
-      enableUI: true,
-      projectConfig: {
-        store_cors: process.env.STORE_CORS,
-        admin_cors: process.env.ADMIN_CORS,
-      },
-    },
-  },
+
   {
     resolve: "@medusajs/admin",
     /** @type {import('@medusajs/admin').PluginOptions} */
