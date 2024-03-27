@@ -4,6 +4,11 @@ import {
   OrderService,
 } from "@medusajs/medusa";
 import { relative } from "path";
+import { render } from "@react-email/render";
+import sendgrid from "@sendgrid/mail";
+import { AppleReceiptEmail } from "../emails/appleemail";
+
+sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 
 export default async function handleOrderPlaced({
   data,
@@ -49,6 +54,43 @@ export default async function handleOrderPlaced({
       site: "https://samistore.ma",
     },
   });
+
+  const emailoptions = {
+    client: `${order.shipping_address.first_name} ${order.shipping_address.last_name}`,
+    created_at: order.created_at.toLocaleDateString(),
+    city: order.shipping_address.city,
+    paid_total: order.total,
+    ordernumber: order.display_id,
+    email: order.customer.email,
+    subtotal: order.subtotal,
+    total: Number(order.total).toFixed(2),
+    tax_total: Number(order.tax_total).toFixed(2),
+    shipping_total: Number(order.shipping_total).toFixed(2),
+    items: order.items.map((item) => ({
+      id: item.id,
+      thumbnail: item.thumbnail,
+      title: item.title,
+      quantity: item.quantity,
+      original_price: Number(item.unit_price).toFixed(2),
+    })),
+    shipping_address: `${order.shipping_address.address_1}, ${order.shipping_address.address_2} `,
+    order_number: order.display_id,
+    phone: order.shipping_address.phone,
+    site: "https://samistore.ma",
+  };
+
+  const emailHtml: any = render(
+    <AppleReceiptEmail emailoptions={emailoptions} />
+  );
+
+  const options = {
+    from: "supportclient@samistore.ma",
+    to: order.customer.email,
+    subject: "Votre Commande chez SamiStore",
+    html: emailHtml,
+  };
+
+  sendgrid.send(options);
 }
 
 export const config: SubscriberConfig = {
