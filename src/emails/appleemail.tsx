@@ -89,6 +89,7 @@ export const AppleReceiptEmail = ({ emailoptions }) => (
               <Text style={informationTableLabel}>
                 Informations de Livraison
               </Text>
+              <Text style={informationTableValue}>{emailoptions.client}</Text>
               <Text style={informationTableValue}>
                 {emailoptions.shipping_address}
               </Text>
@@ -213,7 +214,7 @@ export const AppleReceiptEmail = ({ emailoptions }) => (
         </Section>
         <Hr style={walletBottomLine} />
         <Text style={footerCopyright}>
-          Copyright © Sami Store . <br />{" "}
+          Copyright © Sami Store 2024 <br />{" "}
           <Link href="https://samistore.ma">All rights reserved</Link>
         </Text>
       </Container>
