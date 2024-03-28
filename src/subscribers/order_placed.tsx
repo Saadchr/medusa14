@@ -95,7 +95,5 @@ export default async function handleOrderPlaced({
 
 export const config: SubscriberConfig = {
   event: OrderService.Events.PLACED,
-  context: {
-    subscriberId: "order-placed",
-  },
+  context: {},
 };
