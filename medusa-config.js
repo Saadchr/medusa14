@@ -234,7 +234,7 @@ const plugins = [
     options: {
       api_key: process.env.SENDGRID_API_KEY,
       from: process.env.SENDGRID_FROM,
-      order_placed_template: process.env.SENDGRID_ORDER_PLACED_ID,
+      // order_placed_template: process.env.SENDGRID_ORDER_PLACED_ID,
       user_password_reset_template: process.env.SENDGRID_USER_PASSWORD_RESET_ID,
     },
   },
