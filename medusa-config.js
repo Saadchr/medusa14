@@ -276,6 +276,7 @@ const projectConfig = {
   database_url: process.env.DATABASE_URL,
   admin_cors: process.env.ADMIN_CORS,
   redis_url: process.env.REDIS_URL,
+  worker_mode: process.env.MEDUSA_WORKER_MODE,
 };
 
 /** @type {import('@medusajs/medusa').ConfigModule} */
